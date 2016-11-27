@@ -1,7 +1,8 @@
-/********************************************
+/******************************************************
  * Parallel code
- * it requires the number of steps
-********************************************/
+ * it requires the number of stepsi
+ * the computational core is in a separate function
+******************************************************/
 
 #include <omp.h>
 #include <stdio.h>
@@ -9,12 +10,22 @@
 
 static long num_steps;
 double step, pi;
+double sum = 0.0;
+
+void pi_calc()
+{
+	int i;
+	double x;
+
+	#pragma omp for reduction(+: sum)
+		for (i=0; i < num_steps; i++) {
+			x = (i + 0.5)*step;
+			sum = sum + 4.0/(1.0 + x*x);
+		}
+}
 
 int main(int argc,char *argv[])
 {
-	int i;
-	double x, sum = 0.0;
-
 	if (argc != 2) {
 		printf("Insert the number of steps\n");
 		return 1;
@@ -25,11 +36,8 @@ int main(int argc,char *argv[])
 
 	double initialTime = omp_get_wtime();
 
-	#pragma omp parallel for private(x) reduction(+: sum)
-		for (i=0; i < num_steps; i++) {
-			x = (i + 0.5)*step;
-			sum = sum + 4.0/(1.0 + x*x);
-		}
+	#pragma omp parallel
+		pi_calc();
 
 	double finalTime = omp_get_wtime();
 

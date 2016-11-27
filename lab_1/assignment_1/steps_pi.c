@@ -1,3 +1,9 @@
+/*****************************************
+ * Serial code
+ * it requires the number of steps
+ * it prints the time of calculation
+******************************************/
+
 #include <omp.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -16,7 +22,6 @@ int main(int argc,char *argv[])
 	}
 
 	num_steps = atol(argv[1]);
-
 	step = 1.0/(double) num_steps;
 
 	double initialTime = omp_get_wtime();
@@ -31,6 +36,5 @@ int main(int argc,char *argv[])
 	pi = step * sum;
 	printf("Pi = %1.10f\n", pi);
 	printf("Time for calculation = %f\n", (finalTime - initialTime));
-
 	return 0;
 }

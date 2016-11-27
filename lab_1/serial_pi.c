@@ -1,3 +1,7 @@
+/*****************************
+ * Serial code
+*****************************/
+
 #include <stdio.h>
 
 static long num_steps=100000;
@@ -17,6 +21,5 @@ int main(int argc,char *argv[])
 
 	pi = step * sum;
 	printf("Pi = %f\n", pi);
-
 	return 0;
 }
