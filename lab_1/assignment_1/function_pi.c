@@ -22,6 +22,7 @@ void pi_calc()
 			x = (i + 0.5)*step;
 			sum = sum + 4.0/(1.0 + x*x);
 		}
+	pi = step * sum;
 }
 
 int main(int argc,char *argv[])
@@ -41,7 +42,6 @@ int main(int argc,char *argv[])
 
 	double finalTime = omp_get_wtime();
 
-	pi = step * sum;
 	printf("Pi = %1.10f\n", pi);
 	printf("Time for calculation = %f\n", (finalTime - initialTime));
 	return 0;
