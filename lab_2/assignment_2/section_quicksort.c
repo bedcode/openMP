@@ -1,6 +1,5 @@
 /********************************************************************************
  * Parallel code: section
-#include "stdio.h"
  * Before execute the script type in a terminal:
  * OMP_STACKSIZE='1G'
  * export OMP_STACKSIZE
