@@ -1,12 +1,17 @@
-/****************************
+/********************************************************************************
  * Parallel code: section
-****************************/
+#include "stdio.h"
+ * Before execute the script type in a terminal:
+ * OMP_STACKSIZE='1G'
+ * export OMP_STACKSIZE
+ * reference -> https://gcc.gnu.org/onlinedocs/libgomp/OMP_005fSTACKSIZE.html
+********************************************************************************/
 #include "stdio.h"
 #include "stdlib.h"
-#include "time.h"
 #include "omp.h"
-#define DEPTH_MAX 4
+#define DEPTH_MAX 10
 #define DEPTH_MIN 1
+#define N 100000
 
 int split(int a[], int lower, int upper);
 void quicksort(int a[], int lower, int upper, int depth);
@@ -15,28 +20,26 @@ void quicksort_serial(int a[], int lower, int upper);
 
 int main(int argc, char *argv[])
 {
-	int arr[100];
-	int i, j;
+	int *arr;
+	int i;
 	double end, start = omp_get_wtime();
 
-	srand(time(NULL));
-	#pragma omp parallel for private(j) schedule(static, 10)
-		for (j = 0; j < 100; j++) {
-			arr[j] = j*rand()*0.00001;
-		}
+    arr = malloc(N*sizeof(int));
+	for (i = 0; i < N; i++) {
+		arr[i] = N - i;
+	}
 
-	#pragma omp barrier
-	printf("Full array\n");
-
-	quicksort(arr, 0, 99, DEPTH_MIN);
+	quicksort(arr, 0, N - 1, DEPTH_MIN);
 
 	end = omp_get_wtime();
 
-	printf("Calculation time: %f\n", (end - start));
 	printf("\nArray after sorting:\n");
 
-	for (i = 0 ; i <= 99 ; i++)
+	for (i = 0; i <= N - 1; i++)
 		printf("%d\t", arr[i]);
+
+	printf("\nCalculation time: %f\n", end - start);
+	free(arr);
 
 	return 0;
 }
@@ -51,15 +54,15 @@ void quicksort(int a[], int lower, int upper, int depth)
 
 	int i;
 	if (upper > lower) {
-		i = split (a, lower, upper);
+		i = split(a, lower, upper);
 		#pragma omp parallel
 		{
 			#pragma omp sections
 			{
 				#pragma omp section
-					quicksort (a, lower, i - 1, depth + 1);
+					quicksort(a, lower, i - 1, depth + 1);
 				#pragma omp section
-					quicksort (a, i + 1, upper, depth + 1);
+					quicksort(a, i + 1, upper, depth + 1);
 			}
 		}
 	}
@@ -74,7 +77,7 @@ void quicksort_serial(int a[], int lower, int upper)
 		i = split(a, lower, upper);
 		quicksort_serial(a, lower, i - 1);
 		quicksort_serial(a, i + 1, upper);
-	 }
+	}
 }
 
 
