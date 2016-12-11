@@ -1,7 +1,14 @@
-/**********************
+/********************************************************************************
  * Serial code
-**********************/
+ * Before execute the script type in a terminal:
+ * OMP_STACKSIZE='1G'
+ * export OMP_STACKSIZE
+ * reference -> https://gcc.gnu.org/onlinedocs/libgomp/OMP_005fSTACKSIZE.html
+*********************************************************************************/
 #include "stdio.h"
+#include "stdlib.h"
+#include "omp.h"
+#define N 100000
 
 void quicksort(int a[], int lower, int upper);
 int split(int a[], int lower, int upper);
@@ -9,14 +16,24 @@ int split(int a[], int lower, int upper);
 
 int main(int argc, char *argv[])
 {
-	int arr[10] = {11, 2, 9, 13, 57, 25, 17, 1, 90, 3};
+	int *arr;
 	int i;
+	double end, start = omp_get_wtime();
 
-	quicksort (arr, 0, 9);
+	arr = malloc(N*sizeof(int));
+	for (i = 0; i < N; i++) {
+		arr[i] = N - i;
+	}
+
+	quicksort (arr, 0, N - 1);
+	end = omp_get_wtime();
 
 	printf("Array after sorting:\n");
-	for (i = 0 ; i <= 9 ; i++)
+	for (i = 0; i <= N - 1; i++)
 		printf("%d\t", arr[i]);
+
+	printf("\nCalculation time: %f\n", end - start);
+	free(arr);
 
 	return 0;
 }
