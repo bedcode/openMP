@@ -1,5 +1,5 @@
 /************************************
- * serial code
+ * parallel code - version 1
  * it requires the size of the array
 ************************************/
 
@@ -16,6 +16,8 @@ void OddEvenSort(int *A, int N)
 
     while (exch || start) {
         exch = 0;
+
+    #pragma omp parallel for private(temp)
         for (i = start; i < N-1; i += 2) {
             if (A[i] > A[i+1]) {
                 temp = A[i];
@@ -24,10 +26,10 @@ void OddEvenSort(int *A, int N)
                 exch = 1;
             }
         }
-        if (start == 0)
-            start = 1;
-        else
-            start = 0;
+    if (start == 0)
+        start = 1;
+    else
+        start = 0;
     }
 }
 
