@@ -36,6 +36,7 @@
 \usepackage{amsfonts}%
 \usepackage{amssymb}%
 \usepackage{graphicx}
+\usepackage{url}
 %----------------------------------------------------------
 
 %----------------------------------------------------------
@@ -53,42 +54,40 @@
 In the 1940s, the physicist and mathematician John von Neumann began working
 on the solution of the mystery of self-reproduction as employed in biological systems. He was
 interested in the use of computing devices to model the complex behavior of organisms.
-Von Neumann was determined to answer the question, "`What kind of logical organization is sucient for
-an automaton to be able to reproduce itself ?" He proposed a solution to this question in
-his book Theory of Self-Reproducing Automata (completed and publishedin 1966).
+Von Neumann was determined to answer the question, "What kind of logical organization is sufficient for
+an automaton to be able to reproduce itself?" He proposed a solution to this question in
+his book Theory of Self-Reproducing Automata (completed and published in 1966).
 
 \noindent Since then, cellular automata have been used in a variety of ways and have taken on multiple
 definitions, but it is generally agreed upon that all cellular automata consist of a collection of
-'colored' cells on a grid of specified shape that evolves through a number of discrete time steps
-according to a set of rules based on the states of neighboring cells." As such, every cellular
+'colored' cells on a grid of specified shape, that evolves through a number of discrete time steps
+according to a set of rules based on the states of neighboring cells. As such, every cellular
 automata consists of a certain type of cellular space and a transition rule. The cellular space can
 be described in terms of any d-dimensional regular lattice of cells with finite boundary conditions.
 Each cell has $k $number of states where $k$ is most commonly used as a positive integer ($k : k \in Z+$). The set of states is denoted $\sum$ , making $k = |\sum|$. 
 
 \chapter{Conway's Game of Life}
 
-In the 1970s, Cambridge Professor John Conway invented a 2-dimensional cellular automaton consisting of a Moore neighborhood that he called "life"'. In doing so, he was hoping to be able to study the macroscopic behaviors of a population . 
+In the 1970s, Cambridge Professor John Conway invented a 2-dimensional cellular automaton consisting of a Moore neighborhood that he called "life". In doing so, he was hoping to be able to study the macroscopic behaviors of a population.
 
-\noindent The "game" is a zero-player game, meaning that its evolution is determined by its initial state, requiring no further input. One interacts with the Game of Life by creating an initial configuration and observing how it evolves, or, for advanced "players", by creating patterns with particular properties. 
+\noindent The "game" is a zero-player game, meaning that its evolution is determined by its initial state, requiring no further input. One interacts with the Game of Life by creating an initial configuration and observing how it evolves, or, for advanced "players", by creating patterns with particular properties.
 
 \section{Basic Rules}
 Conway experimented with various transition rules and eventually decided on this setup:
 \begin{itemize}
 
 	\item $\sum = \{0, 1\}$ where a state of 0 represents a dead member of the population    and 1 represents an alive member of the population;
-	
 	\item The transition rule consists of either the death of a member (going from $1 \rightarrow 0$), birth of a member ($0 \rightarrow 1$), or no change ($0 \rightarrow 0$ or $1 \rightarrow 1$);
-	
 	\item With zero or one bordering member alive in a cells neighborhood, death occurs due to loneliness;
 	\item With two or three members alive in the neighborhood, there is no change to an alive member;
-	\item If a dead members neighborhood consists of three live members, a new member is born ($0 \rightarrow 1$);
-	\item If a live members neighborhood consists of more than three live members, it will die due to overpopulation;
+	\item If a dead member's neighborhood consists of three live members, a new member is born ($0 \rightarrow 1$);
+	\item If a live member's neighborhood consists of more than three live members, it will die due to overpopulation.
 \end{itemize}
- 
 
 
- 
- 
+
+
+
 
 
 
@@ -108,9 +107,9 @@ Conway experimented with various transition rules and eventually decided on this
 
 
 \begin{thebibliography}{9}
-\bibitem {Life} Caleb Koch,  'Regularity in Conway's Game of Life', 2015
-\bibitem {wiki} Web, https:\slash\slash en.wikipedia.org\slash wiki\slash Conway's\_Game\_of\_Life
-\bibitem {stan} Web,  http:\slash\slash web.stanford.edu\slash\~cdebs\slash GameOfLife\slash
+\bibitem {Life} Caleb Koch, "Regularity in Conway's Game of Life", 2015
+\bibitem {wiki} Web, \url{https://en.wikipedia.org/wiki/Conway's_Game_of_Life}
+\bibitem {stan} Web, \url{http://web.stanford.edu/~cdebs/GameOfLife}
 \end{thebibliography}
 \end{document}
 
