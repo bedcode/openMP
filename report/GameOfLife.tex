@@ -3,7 +3,7 @@
 
 %----------------------------------------------------------
 %
-\documentclass{report}%
+\documentclass{report}
 %
 %----------------------------------------------------------
 % This is a sample document for the standard LaTeX Report Class
@@ -32,9 +32,9 @@
 % ensures that the paper size is a4, fonts are typeset at the size 12p
 % and the equation numbers are on the left side.
 %
-\usepackage{amsmath}%
-\usepackage{amsfonts}%
-\usepackage{amssymb}%
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amssymb}
 \usepackage{graphicx}
 \usepackage{url}
 %----------------------------------------------------------
@@ -42,13 +42,41 @@
 %----------------------------------------------------------
 \begin{document}
 
-\title{Game of Life 2D}
-\author{Federica Amato, Andrea Bonandin}
-\date{February 2017}
-\maketitle
-\tableofcontents
+\begin{titlepage}
+	\centering
+	\includegraphics[scale = 0.4]{logo.jpeg}\\[1.0 cm]
+	\textsc{\LARGE University of Pavia}\\[1.0 cm]
+	\textsc{\Large Advanced Computer Architecture}\\[0.5 cm]
+	\rule{\linewidth}{0.2 mm} \\[0.4 cm]
+	{\huge{\textbf{Game of Life 2D}}}\\
+	\rule{\linewidth}{0.2 mm} \\[1 cm]
 
-%\part{The First Part}
+	{\large Federica Amato, Andrea Bonandin} \\[0.2 cm]
+	\url{federica.amato02@universitadipavia.it}
+	\url{andrea.bonandin01@universitadipavia.it} \\[0.2 cm]
+	{February 2017}
+
+%	\begin{minipage}{0.4\textwidth}
+%		\begin{flushleft} \large
+%			\emph{Author:}\\
+%			%\theauthor
+%			\end{flushleft}
+%			\end{minipage}
+%			\begin{minipage}{0.4\textwidth}
+%			\begin{flushright} \large
+%			\emph{Student Number:} \\
+%			XXXXXX000									% Your Student Number
+%		\end{flushright}
+%	\end{minipage}\\[2 cm]
+	
+	%{\large \thedate}\\[2 cm]
+\end{titlepage}
+
+%\title{\large{University of Pavia \\ Advanced Computer Architecture} \\ \huge{\textbf{Game of Life 2D}}}
+%\author{Federica Amato, Andrea Bonandin \\ \\ \url{federica.amato02@universitadipavia.it} \\ \url{andrea.bonandin01@universitadipavia.it}}
+\date{February 2017}
+%\maketitle
+\tableofcontents
 
 \chapter{Introduction}
 In the 1940s, the physicist and mathematician John von Neumann began working
@@ -83,17 +111,6 @@ Conway experimented with various transition rules and eventually decided on this
 	\item If a dead member's neighborhood consists of three live members, a new member is born ($0 \rightarrow 1$);
 	\item If a live member's neighborhood consists of more than three live members, it will die due to overpopulation.
 \end{itemize}
-
-
-
-
-
-
-
-
-
-
-
 
 
 \appendix
