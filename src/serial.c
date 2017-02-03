@@ -15,31 +15,19 @@ void show(int **new);
 void init(int *old) {
     int i, j;
     float x;
-/*
-    for(i = 1; i <= NI; i++) {
-        for(j = 1; j <= NJ; j++){
-            x = rand()/((float)RAND_MAX + 1);
-            if(x < 0.5) {
-                old[i*NI + j] = 0;
-            } else {
-                old[i*NI + j] = 1;
+
+    for(i = 0; i < NI+2; i++) {
+        for(j = 0; j < NJ+2; j++){
+            if (i==0 || j==0 || i==NI+1 || j==NJ+1)
+                old[i*(NJ+1)+j]=0;
+            else {
+                x = rand()/((float)RAND_MAX + 1);
+                if(x < 0.5) {
+                    old[i*(NJ+1)+j] = 0;
+                } else {
+                    old[i*(NJ+1)+j] = 1;
+                }
             }
-        }
-    }
-*/
-    j = 0;
-    for (i = NJ + 3; i <= (NI+2)*(NJ+2) - NJ+3; i++) {
-        if (j < NJ) {
-            x = rand()/((float)RAND_MAX + 1);
-            if(x < 0.5) {
-                old[i] = 0;
-            } else {
-                old[i] = 1;
-            }
-            j++;
-        } else {
-            j = 0;
-            i = i + 1;
         }
     }
 }
@@ -132,44 +120,13 @@ int main(int argc, char *argv[]) {
     new = malloc(ni*nj*sizeof(int));
 
     init(old);
+
     for(i = 0; i <= NI + 1; i++) {
-        for(j = 0; j <= NJ +1 ; j++) {
-            printf("%d", old[i*NI +j]);
+        for(j = 0; j <= NJ + 1; j++) {
+            printf("%d", old[i*(NJ+1) +j]);
         }
         printf("\n");
     }
-
-/*
-    ni = NI + 2;
-    nj = NJ + 2;
-    int **old, **new;
-    int i, j;
-    float x;
-    old = malloc(ni*sizeof(int*));
-    new = malloc(ni*sizeof(int*));
-
-    for(i = 0; i < ni; i++) {
-        old[i] = malloc(nj*sizeof(int));
-        new[i] = malloc(nj*sizeof(int));
-    }
-
-
-    for(i = 1; i <= NI; i++) {
-        for(j = 1; j <= NJ; j++){
-            x = rand()/((float)RAND_MAX + 1);
-            if(x < 0.5) {
-                old[i][j] = 0;
-            } else {
-                old[i][j] = 1;
-            }
-        }
-    }
-    for(i = 0; i <= NI+ 1; i++) {
-        for(j = 0; j <= NJ +1; j++){
-            printf("%d", old[i][j]);
-        }
-        printf("\n");
-    }*/
 
     return 0;
 }
