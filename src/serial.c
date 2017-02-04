@@ -7,9 +7,9 @@
 #define NSTEPS 500    /* number of time steps */
 
 void init(int *old);
-void evolve(int **old, int **new);
-void update(int **old, int **new);
-void show(int **new);
+void evolve(int *old, int *new);
+void update(int *old, int *new);
+void show(int *array);
 
 /* initialize elements of old to 0 or 1 */
 void init(int *old) {
@@ -32,78 +32,71 @@ void init(int *old) {
     }
 }
 
-void evolve(int **old, int **new) {
-    int i, j, n, im, ip, jm, jp, nsum;
-    /*  time steps */
-    for(n = 0; n < NSTEPS; n++) {
+/* change from old state to new state */
+void evolve(int *old, int *new) {
+    int i, j, im, ip, jm, jp, nsum;
 
-        /* corner boundary conditions */
-        old[0][0] = old[NI][NJ];
-        old[0][NJ+1] = old[NI][1];
-        old[NI+1][NJ+1] = old[1][1];
-        old[NI+1][0] = old[1][NJ];
+    /* corner boundary conditions */
+    old[0][0] = old[NI][NJ];
+    old[0][NJ+1] = old[NI][1];
+    old[NI+1][NJ+1] = old[1][1];
+    old[NI+1][0] = old[1][NJ];
 
-        /* left-right boundary conditions */
+    /* left-right boundary conditions */
+    for(i = 1; i <= NI; i++){
+        old[i][0] = old[i][NJ];
+        old[i][NJ+1] = old[i][1];
+    }
 
-        for(i = 1; i <= NI; i++){
-            old[i][0] = old[i][NJ];
-            old[i][NJ+1] = old[i][1];
-        }
+    /* top-bottom boundary conditions */
+    for(j = 1; j <= NJ; j++){
+        old[0][j] = old[NI][j];
+        old[NI+1][j] = old[1][j];
+    }
 
-        /* top-bottom boundary conditions */
+    for(i = 1; i <= NI; i++) {
+        for(j = 1; j<=NJ; j++) {
+            im = i-1;
+            ip = i+1;
+            jm = j-1;
+            jp = j+1;
 
-        for(j = 1; j <= NJ; j++){
-            old[0][j] = old[NI][j];
-            old[NI+1][j] = old[1][j];
-        }
+            nsum = old[im][jp] + old[i][jp] + old[ip][jp] + old[im][j] + old[ip][j] + old[im][jm] + old[i][jm] + old[ip][jm];
 
-        for(i = 1; i <= NI; i++) {
-            for(j = 1; j<=NJ; j++) {
-                im = i-1;
-                ip = i+1;
-                jm = j-1;
-                jp = j+1;
-
-                nsum = old[im][jp] + old[i][jp] + old[ip][jp] + old[im][j] + old[ip][j] + old[im][jm] + old[i][jm] + old[ip][jm];
-
-                switch(nsum) {
-
-                    case 3:
-                        new[i][j] = 1;
-                        break;
-
-                    case 2:
-                        new[i][j] = old[i][j];
-                        break;
-
-                    default:
-                        new[i][j] = 0;
-                }
+            if (nsum == 3) {
+                new[i*(NJ+1) + j] = 1;
+            } else if (nsum == 2) {
+                new[i*(NJ+1) + j] = old[i*(NJ+1) + j];
+            } else {
+                new[i*(NJ+1) + j] = 0;
             }
         }
     }
 }
 
 /* copy new state into old state */
-void update(int **old, int **new) {
-    int n, i, j;
+void update(int *old, int *new) {
+    int i, j;
 
-    for(n = 0; n < NSTEPS; n++) {
-        for(i = 1; i <= NI; i++) {
-            for(j = 1; j <= NJ; j++) {
-                old[i][j] = new[i][j];
-            }
+    for(i = 0; i < NI+2; i++) {
+        for(j = 0; j < NJ+2; j++){
+            if (i==0 || j==0 || i==NI+1 || j==NJ+1)
+                continue;
+            else
+                old[i*(NJ+1) + j] = new[i*(NJ+1) + j];
         }
     }
 }
 
-void show(int **new) {
-    int i, j, isum = 0;
+/* print a given array */
+void show(int *array) {
+    int i, j;
 
-    for(i = 1; i <= NI; i++) {
-        for(j = 1; j <= NJ; j++) {
-            isum = isum + new[i][j];
+    for(i = 0; i <= NI + 1; i++) {
+        for(j = 0; j <= NJ + 1; j++) {
+            printf("%d", array[i*(NJ+1) + j]);
         }
+        printf("\n");
     }
 }
 
@@ -111,7 +104,7 @@ int main(int argc, char *argv[]) {
 
     int ni, nj;
     int *old, *new;
-    int i, j;
+    int i, j, n;
 
     /* allocate arrays */
     ni = NI + 2;  /* add 2 for left and right ghost cells */
@@ -121,12 +114,12 @@ int main(int argc, char *argv[]) {
 
     init(old);
 
-    for(i = 0; i <= NI + 1; i++) {
-        for(j = 0; j <= NJ + 1; j++) {
-            printf("%d", old[i*(NJ+1) +j]);
-        }
-        printf("\n");
-    }
+    /*for (n = 0, n < NSTEPS; n++) {
+        evolve(old, new);
+        update(old, new);
+    }*/
+
+    show(old);
 
     return 0;
 }
