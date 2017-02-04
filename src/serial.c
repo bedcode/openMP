@@ -2,10 +2,12 @@
 #include <stdlib.h>
 #include <omp.h>
 
-#define NI 20        /* array sizes */
-#define NJ 20
-#define NSTEPS 500    /* number of time steps */
-
+#define NI 3      /* array sizes */
+#define NJ 3
+#define NSTEPS 1    /* number of time steps */
+#define BOUND 2
+#define BORDERI (BOUND + NI)
+#define BORDERJ (BOUND + NJ)
 void init(int *old);
 void evolve(int *old, int *new);
 void update(int *old, int *new);
@@ -19,13 +21,13 @@ void init(int *old) {
     for(i = 0; i < NI+2; i++) {
         for(j = 0; j < NJ+2; j++){
             if (i==0 || j==0 || i==NI+1 || j==NJ+1)
-                old[i*(NJ+1)+j]=0;
+                old[i*(NJ+2)+j]=0;
             else {
                 x = rand()/((float)RAND_MAX + 1);
                 if(x < 0.5) {
-                    old[i*(NJ+1)+j] = 0;
+                    old[i*(NJ+2)+j] = 0;
                 } else {
-                    old[i*(NJ+1)+j] = 1;
+                    old[i*(NJ+2)+j] = 1;
                 }
             }
         }
@@ -34,41 +36,53 @@ void init(int *old) {
 
 /* change from old state to new state */
 void evolve(int *old, int *new) {
-    int i, j, im, ip, jm, jp, nsum;
+    int i, j, iu, id, jl, jr, nsum= 0;
 
     /* corner boundary conditions */
-    old[0][0] = old[NI][NJ];
-    old[0][NJ+1] = old[NI][1];
-    old[NI+1][NJ+1] = old[1][1];
-    old[NI+1][0] = old[1][NJ];
+    old[0] = old[(NI)*(NJ +2) + (NJ)];
+    old[NJ+1] = old[NI*(NJ +2) + 1];
+    old[(NI+1)*(NJ+2) + NJ +1] = old[(NJ +2) + 1];
+    old[(NI+1)*(NJ + 2)] = old[1* (NJ +2)+ NJ];
 
     /* left-right boundary conditions */
-    for(i = 1; i <= NI; i++){
-        old[i][0] = old[i][NJ];
-        old[i][NJ+1] = old[i][1];
+    for(i = 0; i < NI+2; i++) {
+        
+            if (i==0 || i==NI+1)
+                continue;
+            old[i*(NJ +2)] = old[i*(NJ+2)+ NJ];
+            old[i*(NJ +2)+NJ+1] = old[i*(NJ +2) + 1];
+    	
     }
 
     /* top-bottom boundary conditions */
-    for(j = 1; j <= NJ; j++){
-        old[0][j] = old[NI][j];
-        old[NI+1][j] = old[1][j];
+    for(j = 0; j <NJ +2; j++){
+    	if ( j==0 || j==NJ+1)
+                continue;
+        old[j] = old[NI*(NJ +2) + j];
+        old[(NI+1)*(NJ +2) + j] = old[((NJ +2) +j)];
     }
+    for(i = 0; i < NI+2; i++) {
+    	
+        for(j = 0; j < NJ+2; j++){
+        
+            if (i==0 || j==0 || i==NI+1 || j==NJ+1)
+                continue;
+            iu = i-1;		//up
+            id = i+1;		//down
+            jl = j-1;		//left
+            jr = j+1;		//right
 
-    for(i = 1; i <= NI; i++) {
-        for(j = 1; j<=NJ; j++) {
-            im = i-1;
-            ip = i+1;
-            jm = j-1;
-            jp = j+1;
-
-            nsum = old[im][jp] + old[i][jp] + old[ip][jp] + old[im][j] + old[ip][j] + old[im][jm] + old[i][jm] + old[ip][jm];
-
+            nsum = old[iu * (NJ +2) +jl] + old[iu * (NJ +2) +j]	+ old[iu * (NJ +2) +jr] + old[i * (NJ +2) +jl] + old[i * (NJ +2) +jr] + old[id * (NJ +2) +jl] + old[id * (NJ +2) +j] + old[id * (NJ +2) +jr];
+            printf(" %d\n", nsum);
             if (nsum == 3) {
-                new[i*(NJ+1) + j] = 1;
+                new[i*(NJ+2) + j] = 1;
+                nsum = 0;
             } else if (nsum == 2) {
-                new[i*(NJ+1) + j] = old[i*(NJ+1) + j];
+                new[i*(NJ+2) + j] = old[i*(NJ+2) + j];
+                nsum = 0;
             } else {
-                new[i*(NJ+1) + j] = 0;
+                new[i*(NJ+2) + j] = 0;
+                nsum = 0;
             }
         }
     }
@@ -83,7 +97,7 @@ void update(int *old, int *new) {
             if (i==0 || j==0 || i==NI+1 || j==NJ+1)
                 continue;
             else
-                old[i*(NJ+1) + j] = new[i*(NJ+1) + j];
+                old[i*(NJ+2) + j] = new[i*(NJ+2) + j];
         }
     }
 }
@@ -94,7 +108,7 @@ void show(int *array) {
 
     for(i = 0; i <= NI + 1; i++) {
         for(j = 0; j <= NJ + 1; j++) {
-            printf("%d", array[i*(NJ+1) + j]);
+            printf("%d", array[i*(NJ+2) + j]);
         }
         printf("\n");
     }
@@ -113,11 +127,12 @@ int main(int argc, char *argv[]) {
     new = malloc(ni*nj*sizeof(int));
 
     init(old);
-
-    /*for (n = 0, n < NSTEPS; n++) {
+    show(old);
+    printf("\n\n");
+    for (n = 0; n < NSTEPS; n++) {
         evolve(old, new);
         update(old, new);
-    }*/
+    }
 
     show(old);
 
