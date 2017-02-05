@@ -2,8 +2,8 @@
 #include <stdlib.h>
 #include <omp.h>
 
-#define NI 3      /* array sizes */
-#define NJ 3
+#define NI 4      /* array sizes */
+#define NJ 4
 #define NSTEPS 1    /* number of time steps */
 #define BOUND 2
 #define BORDERI (BOUND + NI)
@@ -32,12 +32,13 @@ void init(int *old) {
             }
         }
     }
+    
 }
 
 /* change from old state to new state */
 void evolve(int *old, int *new) {
     int i, j, iu, id, jl, jr, nsum= 0;
-
+    
     /* corner boundary conditions */
     old[0] = old[(NI)*(NJ +2) + (NJ)];
     old[NJ+1] = old[NI*(NJ +2) + 1];
@@ -45,35 +46,32 @@ void evolve(int *old, int *new) {
     old[(NI+1)*(NJ + 2)] = old[1* (NJ +2)+ NJ];
 
     /* left-right boundary conditions */
-    for(i = 0; i < NI+2; i++) {
+    for(i = 1; i < NI+1; i++) {
         
-            if (i==0 || i==NI+1)
-                continue;
             old[i*(NJ +2)] = old[i*(NJ+2)+ NJ];
             old[i*(NJ +2)+NJ+1] = old[i*(NJ +2) + 1];
     	
     }
 
     /* top-bottom boundary conditions */
-    for(j = 0; j <NJ +2; j++){
-    	if ( j==0 || j==NJ+1)
-                continue;
+    for(j = 1; j <NJ +1; j++){
+    	
         old[j] = old[NI*(NJ +2) + j];
         old[(NI+1)*(NJ +2) + j] = old[((NJ +2) +j)];
     }
-    for(i = 0; i < NI+2; i++) {
+    show(old);
+    for(i = 1; i < NI+1; i++) {
     	
-        for(j = 0; j < NJ+2; j++){
+        for(j = 1; j < NJ+1; j++){
         
-            if (i==0 || j==0 || i==NI+1 || j==NJ+1)
-                continue;
             iu = i-1;		//up
             id = i+1;		//down
             jl = j-1;		//left
             jr = j+1;		//right
 
             nsum = old[iu * (NJ +2) +jl] + old[iu * (NJ +2) +j]	+ old[iu * (NJ +2) +jr] + old[i * (NJ +2) +jl] + old[i * (NJ +2) +jr] + old[id * (NJ +2) +jl] + old[id * (NJ +2) +j] + old[id * (NJ +2) +jr];
-            printf(" %d\n", nsum);
+            printf("i: %d j:%d sum :%d \n ", i , j, nsum );
+            
             if (nsum == 3) {
                 new[i*(NJ+2) + j] = 1;
                 nsum = 0;
@@ -92,11 +90,9 @@ void evolve(int *old, int *new) {
 void update(int *old, int *new) {
     int i, j;
 
-    for(i = 0; i < NI+2; i++) {
-        for(j = 0; j < NJ+2; j++){
-            if (i==0 || j==0 || i==NI+1 || j==NJ+1)
-                continue;
-            else
+    for(i = 1; i < NI+1; i++) {
+        for(j = 1; j < NJ+1; j++){
+            
                 old[i*(NJ+2) + j] = new[i*(NJ+2) + j];
         }
     }
