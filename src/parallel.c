@@ -2,9 +2,9 @@
 #include <stdlib.h>
 #include <omp.h>
 
-#define NI 5      /* array sizes */
-#define NJ 5
-#define NSTEPS 6  /* number of time steps */
+#define NI 300      /* array sizes */
+#define NJ 300
+#define NSTEPS 200  /* number of time steps */
 #define BORDERI (2 + NI)
 #define BORDERJ (2 + NJ)
 
@@ -18,8 +18,10 @@ void init(int *old) {
     int i, j;
     float x;
 
-    #pragma omp for private(i, j, x)
+    #pragma omp for schedule(static) private(i, j, x)
     for(i = 0; i < BORDERI; i++) {
+	
+	
         for(j = 0; j < BORDERJ; j++){
             if (i==0 || j==0 || i==(BORDERI-1) || j==BORDERJ-1)
                 old[i*(BORDERJ) + j] = 0;
@@ -33,6 +35,7 @@ void init(int *old) {
             }
         }
     }
+    #pragma omp barrier
 }
 
 /* change from old state to new state */
@@ -46,19 +49,21 @@ void evolve(int *old, int *new) {
     old[(BORDERI-1)*(BORDERJ)] = old[BORDERJ + NJ];
 
     /* left-right boundary conditions */
+    #pragma omp for nowait schedule(static) private(i, j)	
     for(i = 1; i < BORDERI-1; i++) {
         old[i*(BORDERJ)] = old[i*(BORDERJ) + NJ];
         old[i*(BORDERJ) + BORDERJ-1] = old[i*(BORDERJ) + 1];
     }
-
+    #pragma omp for nowait schedule(static) private(i, j)
     /* top-bottom boundary conditions */
     for(j = 1; j < BORDERJ-1; j++){
         old[j] = old[NI*BORDERJ + j];
         old[(BORDERI-1)*(BORDERJ) + j] = old[BORDERJ + j];
     }
-
+ 
+    #pragma omp barrier
     //show(old);
-
+    #pragma omp for schedule(static) private(i, j)
     for(i = 1; i < BORDERI-1; i++) {
         for(j = 1; j < BORDERJ-1; j++){
             iu = i-1;   //up
@@ -85,7 +90,7 @@ void evolve(int *old, int *new) {
 /* copy new state into old state */
 void update(int *old, int *new) {
     int i, j;
-
+    #pragma omp for schedule(static) private(i, j)
     for(i = 1; i < BORDERI-1; i++) {
         for(j = 1; j < BORDERJ-1; j++){
              old[i*(BORDERJ) + j] = new[i*(BORDERJ) + j];
@@ -96,7 +101,7 @@ void update(int *old, int *new) {
 /* print a given array */
 void show(int *array) {
     int i, j;
-
+    
     for(i = 0; i < BORDERI; i++) {
         for(j = 0; j < BORDERJ; j++) {
             printf("%d", array[i*(BORDERJ) + j]);
@@ -117,13 +122,11 @@ int main(int argc, char *argv[]) {
     /* allocate arrays */
     old = malloc(BORDERI * BORDERJ * sizeof(int));
     new = malloc(BORDERI * BORDERJ * sizeof(int));
-
-    #pragma omp parallel shared(old, new, n)
+	#pragma parrallel omp
     {
+	
         init(old);
-        #pragma omp barrier
-        #pragma omp master
-        show(old);
+        //show(old);
 
         for (n = 0; n < NSTEPS; n++) {
             evolve(old, new);
@@ -131,7 +134,7 @@ int main(int argc, char *argv[]) {
         }
     }
 
-    //show(old);
+    show(old);
     end = omp_get_wtime();
     printf("Calculation time: %f\n", end - start);
 
