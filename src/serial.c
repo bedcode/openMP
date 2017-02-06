@@ -20,7 +20,7 @@ void init(int *old) {
 
     for(i = 0; i < BORDERI; i++) {
         for(j = 0; j < BORDERJ; j++){
-            if (i==0 || j==0 || i==(BORDERI-1)|| j==BORDERJ-1)
+            if (i==0 || j==0 || i==(BORDERI-1) || j==BORDERJ-1)
                 old[i*(BORDERJ) + j]=0;
             else {
                 x = rand()/((float)RAND_MAX + 1);
@@ -128,6 +128,9 @@ int main(int argc, char *argv[]) {
     //show(old);
     end = omp_get_wtime();
     printf("Calculation time: %f\n", end - start);
+
+    free(old);
+    free(new);
 
     return 0;
 }

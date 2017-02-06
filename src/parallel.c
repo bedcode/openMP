@@ -20,8 +20,8 @@ void init(int *old) {
 
     #pragma omp for schedule(static) private(i, j, x)
     for(i = 0; i < BORDERI; i++) {
-	
-	
+
+
         for(j = 0; j < BORDERJ; j++){
             if (i==0 || j==0 || i==(BORDERI-1) || j==BORDERJ-1)
                 old[i*(BORDERJ) + j] = 0;
@@ -49,7 +49,7 @@ void evolve(int *old, int *new) {
     old[(BORDERI-1)*(BORDERJ)] = old[BORDERJ + NJ];
 
     /* left-right boundary conditions */
-    #pragma omp for nowait schedule(static) private(i, j)	
+    #pragma omp for nowait schedule(static) private(i, j)
     for(i = 1; i < BORDERI-1; i++) {
         old[i*(BORDERJ)] = old[i*(BORDERJ) + NJ];
         old[i*(BORDERJ) + BORDERJ-1] = old[i*(BORDERJ) + 1];
@@ -60,7 +60,7 @@ void evolve(int *old, int *new) {
         old[j] = old[NI*BORDERJ + j];
         old[(BORDERI-1)*(BORDERJ) + j] = old[BORDERJ + j];
     }
- 
+
     #pragma omp barrier
     //show(old);
     #pragma omp for schedule(static) private(i, j)
@@ -101,7 +101,7 @@ void update(int *old, int *new) {
 /* print a given array */
 void show(int *array) {
     int i, j;
-    
+
     for(i = 0; i < BORDERI; i++) {
         for(j = 0; j < BORDERJ; j++) {
             printf("%d", array[i*(BORDERJ) + j]);
@@ -122,9 +122,9 @@ int main(int argc, char *argv[]) {
     /* allocate arrays */
     old = malloc(BORDERI * BORDERJ * sizeof(int));
     new = malloc(BORDERI * BORDERJ * sizeof(int));
-	#pragma parrallel omp
+	#pragma omp parallel
     {
-	
+
         init(old);
         //show(old);
 
@@ -138,5 +138,7 @@ int main(int argc, char *argv[]) {
     end = omp_get_wtime();
     printf("Calculation time: %f\n", end - start);
 
+    free(old);
+    free(new);
     return 0;
 }
