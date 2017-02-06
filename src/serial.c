@@ -4,7 +4,7 @@
 
 #define NI 5      /* array sizes */
 #define NJ 5
-#define NSTEPS 6    /* number of time steps */
+#define NSTEPS 6  /* number of time steps */
 #define BORDERI (2 + NI)
 #define BORDERJ (2 + NJ)
 
@@ -111,21 +111,23 @@ int main(int argc, char *argv[]) {
     int *old, *new;
     int i, j, n;
 
+    double end, start = omp_get_wtime();
+
     /* allocate arrays */
-    ni = BORDERI;  /* add 2 for left and right ghost cells */
-    nj = BORDERJ;
     old = malloc(BORDERI * BORDERJ * sizeof(int));
     new = malloc(BORDERI * BORDERJ * sizeof(int));
 
     init(old);
-    show(old);
+    //show(old);
 
     for (n = 0; n < NSTEPS; n++) {
         evolve(old, new);
         update(old, new);
     }
 
-    show(old);
+    //show(old);
+    end = omp_get_wtime();
+    printf("Calculation time: %f\n", end - start);
 
     return 0;
 }
