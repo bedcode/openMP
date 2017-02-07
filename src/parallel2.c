@@ -1,3 +1,7 @@
+/***********************************************
+ * parallel version with one parallel region
+***********************************************/
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <omp.h>
