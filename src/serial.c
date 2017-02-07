@@ -2,9 +2,9 @@
 #include <stdlib.h>
 #include <omp.h>
 
-#define NI 5      /* array sizes */
-#define NJ 5
-#define NSTEPS 6  /* number of time steps */
+#define NI 500      /* array sizes */
+#define NJ 500
+#define NSTEPS 2000  /* number of time steps */
 #define BORDERI (2 + NI)
 #define BORDERJ (2 + NJ)
 
@@ -87,7 +87,7 @@ void update(int *old, int *new) {
 
     for(i = 1; i < BORDERI-1; i++) {
         for(j = 1; j < BORDERJ-1; j++){
-             old[i*(BORDERJ) + j] = new[i*(BORDERJ) + j];
+            old[i*(BORDERJ) + j] = new[i*(BORDERJ) + j];
         }
     }
 }
@@ -110,12 +110,13 @@ int main(int argc, char *argv[]) {
     int ni, nj;
     int *old, *new;
     int i, j, n;
-
-    double end, start = omp_get_wtime();
+    double end, start;
 
     /* allocate arrays */
     old = malloc(BORDERI * BORDERJ * sizeof(int));
     new = malloc(BORDERI * BORDERJ * sizeof(int));
+
+    start = omp_get_wtime();
 
     init(old);
     //show(old);
