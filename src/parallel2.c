@@ -24,8 +24,6 @@ void init(int *old) {
 
     #pragma omp for schedule(static) private(i, j, x)
     for(i = 0; i < BORDERI; i++) {
-
-
         for(j = 0; j < BORDERJ; j++){
             if (i==0 || j==0 || i==(BORDERI-1) || j==BORDERJ-1)
                 old[i*(BORDERJ) + j] = 0;
@@ -39,7 +37,6 @@ void init(int *old) {
             }
         }
     }
-    #pragma omp barrier
 }
 
 /* change from old state to new state */
@@ -53,19 +50,21 @@ void evolve(int *old, int *new) {
     old[(BORDERI-1)*(BORDERJ)] = old[BORDERJ + NJ];
 
     /* left-right boundary conditions */
-    #pragma omp for nowait schedule(static) private(i, j)
+    #pragma omp for schedule(static) private(i)
     for(i = 1; i < BORDERI-1; i++) {
         old[i*(BORDERJ)] = old[i*(BORDERJ) + NJ];
         old[i*(BORDERJ) + BORDERJ-1] = old[i*(BORDERJ) + 1];
     }
-    #pragma omp for nowait schedule(static) private(i, j)
+
     /* top-bottom boundary conditions */
+    #pragma omp for schedule(static) private(j)
     for(j = 1; j < BORDERJ-1; j++){
         old[j] = old[NI*BORDERJ + j];
         old[(BORDERI-1)*(BORDERJ) + j] = old[BORDERJ + j];
     }
 
     #pragma omp barrier
+
     //show(old);
     #pragma omp for schedule(static) private(i, j)
     for(i = 1; i < BORDERI-1; i++) {
@@ -97,7 +96,7 @@ void update(int *old, int *new) {
     #pragma omp for schedule(static) private(i, j)
     for(i = 1; i < BORDERI-1; i++) {
         for(j = 1; j < BORDERJ-1; j++){
-             old[i*(BORDERJ) + j] = new[i*(BORDERJ) + j];
+            old[i*(BORDERJ) + j] = new[i*(BORDERJ) + j];
         }
     }
 }
@@ -119,26 +118,27 @@ int main(int argc, char *argv[]) {
 
     int ni, nj;
     int *old, *new;
-    int i, j, n;
-
-    double end, start = omp_get_wtime();
+    int i, j;
+    double end, start;
 
     /* allocate arrays */
     old = malloc(BORDERI * BORDERJ * sizeof(int));
     new = malloc(BORDERI * BORDERJ * sizeof(int));
-	#pragma omp parallel
-    {
 
+    start = omp_get_wtime();
+
+    #pragma omp parallel shared(old, new)
+    {
         init(old);
         //show(old);
 
-        for (n = 0; n < NSTEPS; n++) {
+        for (int n = 0; n < NSTEPS; n++) {
             evolve(old, new);
             update(old, new);
         }
     }
 
-    show(old);
+    //show(old);
     end = omp_get_wtime();
     printf("Calculation time: %f\n", end - start);
 
