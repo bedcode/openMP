@@ -6,9 +6,9 @@
 #include <stdlib.h>
 #include <omp.h>
 
-#define NI 5      /* array sizes */
-#define NJ 5
-#define NSTEPS 6  /* number of time steps */
+#define NI 500      /* array sizes */
+#define NJ 500
+#define NSTEPS 2000  /* number of time steps */
 #define BORDERI (2 + NI)
 #define BORDERJ (2 + NJ)
 
@@ -22,6 +22,7 @@ void init(int *old) {
     int i, j;
     float x;
 
+    #pragma omp parallel for schedule(static) private(i, j, x) shared(old)
     for(i = 0; i < BORDERI; i++) {
         for(j = 0; j < BORDERJ; j++){
             if (i==0 || j==0 || i==(BORDERI-1) || j==BORDERJ-1)
@@ -49,12 +50,14 @@ void evolve(int *old, int *new) {
     old[(BORDERI-1)*(BORDERJ)] = old[BORDERJ + NJ];
 
     /* left-right boundary conditions */
+    #pragma omp parallel for schedule(static) private(i) shared(old)
     for(i = 1; i < BORDERI-1; i++) {
         old[i*(BORDERJ)] = old[i*(BORDERJ) + NJ];
         old[i*(BORDERJ) + BORDERJ-1] = old[i*(BORDERJ) + 1];
     }
 
     /* top-bottom boundary conditions */
+    #pragma omp parallel for schedule(static) private(j) shared(old)
     for(j = 1; j < BORDERJ-1; j++){
         old[j] = old[NI*BORDERJ + j];
         old[(BORDERI-1)*(BORDERJ) + j] = old[BORDERJ + j];
@@ -62,6 +65,7 @@ void evolve(int *old, int *new) {
 
     //show(old);
 
+    #pragma omp parallel for schedule(static) private(i, j, iu, id, jl, jr, nsum) shared(old, new)
     for(i = 1; i < BORDERI-1; i++) {
         for(j = 1; j < BORDERJ-1; j++){
             iu = i-1;   //up
@@ -89,9 +93,10 @@ void evolve(int *old, int *new) {
 void update(int *old, int *new) {
     int i, j;
 
+    #pragma omp parallel for schedule(static) private(i, j) shared(old)
     for(i = 1; i < BORDERI-1; i++) {
         for(j = 1; j < BORDERJ-1; j++){
-             old[i*(BORDERJ) + j] = new[i*(BORDERJ) + j];
+            old[i*(BORDERJ) + j] = new[i*(BORDERJ) + j];
         }
     }
 }
@@ -114,12 +119,13 @@ int main(int argc, char *argv[]) {
     int ni, nj;
     int *old, *new;
     int i, j, n;
-
-    double end, start = omp_get_wtime();
+    double end, start;
 
     /* allocate arrays */
     old = malloc(BORDERI * BORDERJ * sizeof(int));
     new = malloc(BORDERI * BORDERJ * sizeof(int));
+
+    start = omp_get_wtime();
 
     init(old);
     //show(old);
