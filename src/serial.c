@@ -107,7 +107,6 @@ void show(int *array) {
 
 int main(int argc, char *argv[]) {
 
-    int ni, nj;
     int *old, *new;
     int i, j, n;
     double end, start;

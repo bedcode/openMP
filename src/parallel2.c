@@ -6,9 +6,9 @@
 #include <stdlib.h>
 #include <omp.h>
 
-#define NI 300      /* array sizes */
-#define NJ 300
-#define NSTEPS 200  /* number of time steps */
+#define NI 500      /* array sizes */
+#define NJ 500
+#define NSTEPS 2000  /* number of time steps */
 #define BORDERI (2 + NI)
 #define BORDERJ (2 + NJ)
 
@@ -116,7 +116,6 @@ void show(int *array) {
 
 int main(int argc, char *argv[]) {
 
-    int ni, nj;
     int *old, *new;
     int i, j;
     double end, start;
