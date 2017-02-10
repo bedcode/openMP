@@ -3,7 +3,7 @@
 
 %----------------------------------------------------------
 %
-\documentclass{report}
+\documentclass[a4paper,11pt,twoside]{report}
 %
 %----------------------------------------------------------
 % This is a sample document for the standard LaTeX Report Class
@@ -37,6 +37,8 @@
 \usepackage{amssymb}
 \usepackage{graphicx}
 \usepackage{url}
+\usepackage{listings} %Per inserire codice
+\usepackage[usenames]{color}
 %----------------------------------------------------------
 
 %----------------------------------------------------------
@@ -60,22 +62,17 @@
 \tableofcontents
 
 \chapter{Introduction}
-In the 1940s, the physicist and mathematician John von Neumann began working
+In the 1940s, the physicist and mathematician John Von Neumann began working
 on the solution of the mystery of self-reproduction as employed in biological systems. He was
 interested in the use of computing devices to model the complex behavior of organisms.
-Von Neumann was determined to answer the question, "What kind of logical organization is sufficient for
-an automaton to be able to reproduce itself?" He proposed a solution to this question in
+Von Neumann was determined to answer the question, "What kind of logical organization is sufficient for an automaton to be able to reproduce itself?" He proposed a solution to this question in
 his book Theory of Self-Reproducing Automata (completed and published in 1966).
 
-\noindent Since then, cellular automata have been used in a variety of ways and have taken on multiple
-definitions, but it is generally agreed upon that all cellular automata consist of a collection of
-'colored' cells on a grid of specified shape, that evolves through a number of discrete time steps
-according to a set of rules based on the states of neighboring cells. As such, every cellular
-automata consists of a certain type of cellular space and a transition rule. The cellular space can
+\noindent Since then, cellular automata have been used in a variety of ways and have taken on multiple definitions, but it is generally agreed upon that all cellular automata consist of a collection of 'colored' cells on a grid of specified shape, that evolves through a number of discrete time steps according to a set of rules based on the states of neighboring cells. As such, every cellular automata consists of a certain type of cellular space and a transition rule. The cellular space can
 be described in terms of any d-dimensional regular lattice of cells with finite boundary conditions.
 Each cell has $k $number of states where $k$ is most commonly used as a positive integer ($k : k \in Z+$). The set of states is denoted $\sum$ , making $k = |\sum|$. 
 
-\chapter{Conway's Game of Life}
+\chapter{Conway's Game of Life}\label{Conway}
 
 In the 1970s, Cambridge Professor John Conway invented a 2-dimensional cellular automaton consisting of a Moore neighborhood that he called "life". In doing so, he was hoping to be able to study the macroscopic behaviors of a population.
 
@@ -94,9 +91,42 @@ Conway experimented with various transition rules and eventually decided on this
 \end{itemize}
 
 
+\chapter {Serial Code Analysis}
+
+In our code, the world of Game of Life is represented by a rectangular grid where there are ones and zeroes. Zeroes represent dead cells instead ones represent cells which are alive. We decided to use toroidal boundary conditions such that no cell could vanish going out from the grid.
+
+\noindent To realize the Conway's Game of Life, we are inspired by the Serial code found in \cite{code}.
+
+\noindent We decided to change the code found to improve performance and modularity. 
+So we managed matrices using a single array to take advantage of the principle of locality of access and we divided the code into three principle functions:  
+\begin{itemize}
+
+	\item \emph{init}: it initializes the matrix with two additional rows and columns set to zero to represent boundaries and sets with zero or one random values the internal grid.
+	\item \emph{evolve}: after setting boundary conditions, it checks the numbers of neighbors and   
+	sets the new cell's state in a second array according with the rules explained in chapter \ref{Conway}.
+	\item \emph{update}: it changes the original array with the new calculated in evolve.
+
+\end{itemize}
+
+\noindent After the allocation of two empty array (one for the actual state and one for the successive), the init function is called, then we enter in a cycle which continues evolving and updating the grid, starting from the initialized array until the set number of generations (see Figure \ref{fig:1} .
+To debug the program we used also a show function which prints the array. 
+
+\noindent However this approach is possible only for small grids and it is not useful for performance measurements. So in the final code is not present.
+
+\begin{figure}
+	\centering
+	\includegraphics[scale = 0.8]{chart.eps}
+	\caption{\emph{Game of Life's flowchart}}\label{fig:1}
+\end{figure}	
+
+
 \appendix
 
+
+
 \chapter{Serial Code}
+
+
 
 
 
@@ -108,6 +138,7 @@ Conway experimented with various transition rules and eventually decided on this
 \bibitem {Life} Caleb Koch, "Regularity in Conway's Game of Life", 2015
 \bibitem {wiki} Web, \url{https://en.wikipedia.org/wiki/Conway's_Game_of_Life}
 \bibitem {stan} Web, \url{http://web.stanford.edu/~cdebs/GameOfLife}
+\bibitem {code} Web, \url{https://www.pdc.kth.se/education/tutorials/summer-school/mpi-exercises/mpi-lab-codes/game_of_life-serial.c/view}
 \end{thebibliography}
 \end{document}
 
