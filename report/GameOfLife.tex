@@ -95,21 +95,21 @@ Conway experimented with various transition rules and eventually decided on this
 
 In our code, the world of Game of Life is represented by a rectangular grid where there are ones and zeroes. Zeroes represent dead cells instead ones represent cells which are alive. We decided to use toroidal boundary conditions such that no cell could vanish going out from the grid.
 
-\noindent To realize the Conway's Game of Life, we are inspired by the Serial code found in \cite{code}.
+\noindent To realize the Conway's Game of Life, we are inspired by the serial code found in \cite{code}.
 
-\noindent We decided to change the code found to improve performance and modularity. 
-So we managed matrices using a single array to take advantage of the principle of locality of access and we divided the code into three principle functions:  
+\noindent We decided to change the code found to improve performance and modularity.
+So we managed matrices using a single array to take advantage of the principle of locality of access and we divided the code into three principle functions:
 \begin{itemize}
 
 	\item \emph{init}: it initializes the matrix with two additional rows and columns set to zero to represent boundaries and sets with zero or one random values the internal grid.
-	\item \emph{evolve}: after setting boundary conditions, it checks the numbers of neighbors and   
+	\item \emph{evolve}: after setting boundary conditions, it checks the numbers of neighbors and
 	sets the new cell's state in a second array according with the rules explained in chapter \ref{Conway}.
-	\item \emph{update}: it changes the original array with the new calculated in evolve.
+	\item \emph{update}: it changes the original array with the new one calculated in evolve.
 
 \end{itemize}
 
-\noindent After the allocation of two empty array (one for the actual state and one for the successive), the init function is called, then we enter in a cycle which continues evolving and updating the grid, starting from the initialized array until the set number of generations (see Figure \ref{fig:1} .
-To debug the program we used also a show function which prints the array. 
+\noindent After the allocation of two empty arrays (one for the actual state and one for the successive), the \emph{init} function is called, then we enter in a cycle which continues evolving and updating the grid, starting from the initialized array until the given number of generations (see Figure \ref{fig:1}).
+To debug the program we used also a \emph{show} function which prints the array.
 
 \noindent However this approach is possible only for small grids and it is not useful for performance measurements. So in the final code is not present.
 
@@ -117,7 +117,7 @@ To debug the program we used also a show function which prints the array.
 	\centering
 	\includegraphics[scale = 0.8]{chart.eps}
 	\caption{\emph{Game of Life's flowchart}}\label{fig:1}
-\end{figure}	
+\end{figure}
 
 
 \appendix
