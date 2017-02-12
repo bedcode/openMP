@@ -40,7 +40,7 @@
 \usepackage{listings} %Per inserire codice
 \usepackage[usenames]{color}
 %----------------------------------------------------------
-
+\linespread{1.5}
 %----------------------------------------------------------
 \begin{document}
 
@@ -112,25 +112,58 @@ So we managed matrices using a single array to take advantage of the principle o
 To debug the program we used also a \emph{show} function which prints the array.
 
 \noindent However this approach is possible only for small grids and it is not useful for performance measurements. So in the final code is not present.
-
 \begin{figure}
 	\centering
 	\includegraphics[scale = 0.8]{chart.eps}
 	\caption{\emph{Game of Life's flowchart}}\label{fig:1}
 \end{figure}
 
+\chapter{Study of available parallelism}
 
-\appendix
+\noindent We studied the available parallelism in all the three functions. 
+
+\noindent Looking at the fact that we dealt with a matrix, even if saved as a single array, in every function we had two nested cycles, one to scan rows and another to scan columns. So we thought to parallelize the external cycle in all the functions in order to change more than one row at the same time. 
+
+\noindent In our algorithm, there are no complex calculus, the potential speedup is given by the possibility to change more cells at the same time. This is made possible by the fact that there are two matrices that represent the same grid in two different generations, so modifying at the same time the new value of many cells there is not the risk of the result's impairment. 
+In addition, in the \emph{evolve} function there are two more independent cycles to fix the boundary condition before the evolution of the game. Also these cycles can be parallelized. 
+Contrariwise, in the main, the cycle on the generations cannot be parallelized, because one evolution is dependent on the previous, so it is fundamental to preserve the serial order. 
+
+\chapter{OpenMP parallel implementation}
+We thought different parallel implementations:
+\begin{enumerate}
+	\item we decided to try opening only one parallel region at the program start with the serial cycle on generations and then having the for parallelization on our three functions. We tried this because we thought to avoid the continued creation and destruction of the used thread at each iteration of the generational change. We used static scheduling.
+	\item we tried with one parallel region in every function to validate our idea, so we expected a smaller speedup which has been the found result. Obviously we used static scheduling to have a real comparison with the first version.
+	\item finally we try to use dynamic scheduling, with different chuncksizes, instead the static scheduling on the version with only one parallel region. We try only on this because we looked that was the quicker.
+	\end{enumerate}
+	
+	
 
 
 
-\chapter{Serial Code}
+\chapter{CPU characteristics}
+To run the program we used a notebook with as processor Intel® Core™ i5-3230M Processor.
+This processor has two physical cores and four logic cores. So, we decided to evaluate the performance of the parallelized code using two and four threads. We expected the best was with two threads, but , even if the real core are two, hyper-threading let have some advantage if the instruction are no dependent and so they don't create stalls. 
+
+\noindent Our program does not have dependences on the cycles we wanted to parallelize, so it could be that hyper-threading gave benefits even if not so large.
+
+\noindent We report all its characteristics in Figure \ref{fig:2}.
+
+\begin{figure}
+	\centering
+	\includegraphics[scale = 0.5]{i5.eps}
+	\caption{processor's characteristics} \label{fig:2}
+\end{figure}	
 
 
 
 
 
-\chapter{Parallel Code}
+\chapter{Performance's Measurements}
+\noindent Initially we try running the serial program several times, measuring the time interval, using different dimensions of the matrix and different numbers of generations.
+We decided to use square matrix to save the times, but we try also some cases with rectangular matrices to see if and how there was changes on the parallel behavior.
+	
+
+
 
 
 
