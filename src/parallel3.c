@@ -6,10 +6,10 @@
 #include <stdlib.h>
 #include <omp.h>
 
-#define NI 500      /* array sizes */
-#define NJ 500
-#define NSTEPS 2000  /* number of time steps */
-#define BORDERI (2 + NI)
+#define NI 1000      /* array sizes */
+#define NJ 1000
+#define NSTEPS 100  /* number of time steps */
+#define BORDERI (2 + NI)   /* added borders to the grid */
 #define BORDERJ (2 + NJ)
 #define CHUNCKSIZE 10
 
@@ -18,7 +18,7 @@ void evolve(int *old, int *new);
 void update(int *old, int *new);
 void show(int *array);
 
-/* initialize elements of old to 0 or 1 */
+/* initialize elements of the array to 0 or 1 randomly */
 void init(int *old) {
     int i, j;
     float x;
@@ -26,8 +26,10 @@ void init(int *old) {
     #pragma omp for schedule(dynamic, CHUNCKSIZE) private(i, j, x)
     for(i = 0; i < BORDERI; i++) {
         for(j = 0; j < BORDERJ; j++){
-            if (i==0 || j==0 || i==(BORDERI-1) || j==BORDERJ-1)
+            if (i==0 || j==0 || i==(BORDERI-1) || j==(BORDERJ-1)) {
+                /* borders are initialized to 0 */
                 old[i*(BORDERJ) + j] = 0;
+            }
             else {
                 x = rand()/((float)RAND_MAX + 1);
                 if(x < 0.5) {
@@ -75,16 +77,18 @@ void evolve(int *old, int *new) {
             jl = j-1;   //left
             jr = j+1;   //right
 
+            /* sum of the neighbors of a cell */
             nsum = old[iu * (BORDERJ) +jl] + old[iu * (BORDERJ) +j] + old[iu * (BORDERJ) +jr] + old[i * (BORDERJ) +jl] + old[i * (BORDERJ) +jr] + old[id * (BORDERJ) +jl] + old[id * (BORDERJ) +j] + old[id * (BORDERJ) +jr];
             //printf("i: %d j:%d sum :%d \n ", i , j, nsum);
+
             if (nsum == 3) {
-                new[i*(BORDERJ) + j] = 1;
+                new[i*(BORDERJ) + j] = 1;   /* alive */
                 nsum = 0;
             } else if (nsum == 2) {
-                new[i*(BORDERJ) + j] = old[i*(BORDERJ) + j];
+                new[i*(BORDERJ) + j] = old[i*(BORDERJ) + j];   /* equal to the previous state */
                 nsum = 0;
             } else {
-                new[i*(BORDERJ) + j] = 0;
+                new[i*(BORDERJ) + j] = 0;   /* dead */
                 nsum = 0;
             }
         }
