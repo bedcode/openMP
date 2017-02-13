@@ -1,0 +1,11 @@
+\begin{itemize}
+
+	\item \emph{init}: it initializes the matrix with two additional rows and columns set to zero to represent boundaries and sets with zero or one random values the internal grid.
+	\item \emph{evolve}: initially it sets boundary conditions, in other words it assigns to the borders outer values of the grid. This operation is divided into three parts: corner, left-right, top-bottom boundary conditions.
+	This technique allows to minimize errors due to growth of the population, in the case it can no longer stay in the grid. The core of the function is the evolution of the grid according with
+	the rules explained in chapter \ref{Conway}. In order to apply rules in a faster and simpler way we arrange them through the sum of the neighbors of a cell. Each cell is the central one of a 3x3
+	sub-grid, we sum the values inside the sub-grid except for the central cell. Then if the sum is 3 the new state of the central cell is alive (no matter about its old state), if the sum is 2 state
+	doesn't change, finally in all other cases the cell is dead. We repeat these steps for every cell in the grid.
+	\item \emph{update}: it changes the original array with the new one calculated in evolve.
+
+\end{itemize}
