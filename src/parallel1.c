@@ -6,9 +6,9 @@
 #include <stdlib.h>
 #include <omp.h>
 
-#define NI 3     /* array sizes */
-#define NJ 3
-#define NSTEPS 1  /* number of time steps */
+#define NI 1000     /* array sizes */
+#define NJ 1000
+#define NSTEPS 100  /* number of time steps */
 #define BORDERI (2 + NI)   /* added borders to the grid */
 #define BORDERJ (2 + NJ)
 
@@ -29,32 +29,14 @@ void init(int *old) {
                 /* borders are initialized to 0 */
                 old[i*(BORDERJ) + j]=0;
             }
-            /*else {
+            else {
                 x = rand()/((float)RAND_MAX + 1);
                 if(x < 0.5) {
                     old[i*(BORDERJ) + j] = 0;
                 } else {
                     old[i*(BORDERJ) + j] = 1;
                 }
-            }*/
-            if (i == 3 && j== 1)
-                old[i*BORDERJ +j] =0;
-            if (i == 3 && j== 2)
-                old[i*BORDERJ +j] =0;
-            if (i == 3 && j== 3)
-                old[i*BORDERJ +j] =0;
-            if (i == 1 && j== 1)
-                old[i*BORDERJ +j] =1;
-            if (i == 1 && j== 2)
-                old[i*BORDERJ +j] =1;
-            if (i == 1 && j== 3)
-                old[i*BORDERJ +j] =1;
-            if (i == 2 && j== 1)
-                old[i*BORDERJ +j] =0;
-            if (i == 2 && j== 2)
-                old[i*BORDERJ +j] =0;
-            if (i == 2 && j== 3)
-                old[i*BORDERJ +j] =0;
+            }
         }
     }
 }
@@ -149,12 +131,11 @@ int main(int argc, char *argv[]) {
     start = omp_get_wtime();
 
     init(old);
-    show(old);
+    //show(old);
 
     for (n = 0; n < NSTEPS; n++) {
         evolve(old, new);
         update(old, new);
-        show(old);
     }
 
     //show(old);
