@@ -74,7 +74,7 @@ Each cell has $k$ number of states where $k$ is most commonly used as a positive
 
 \chapter{Conway's Game of Life}\label{Conway}
 
-In the 1970s, Cambridge Professor John Conway invented a 2-dimensional cellular automaton consisting of a Moore neighborhood that he called "life". In doing so, he was hoping to be able to study the macroscopic behaviors of a population.
+In the 1970s, Cambridge's Professor John Conway invented a 2-dimensional cellular automaton consisting of a Moore neighborhood that he called "life". In doing so, he was hoping to be able to study the macroscopic behaviors of a population.
 
 \noindent The "game" is a zero-player game, meaning that its evolution is determined by its initial state, requiring no further input. A user interacts with the Game of Life by creating an initial configuration and observing how it evolves, or, for advanced "players", by creating patterns with particular properties.
 
@@ -96,7 +96,7 @@ In our code, the world of Game of Life is represented by a rectangular grid wher
 
 \noindent To realize the Conway's Game of Life, we are inspired by the serial code found in \cite{code}.
 
-\noindent We decided to change the code found to improve performance and modularity.
+\noindent We decided to change the code found to improve performances and modularity.
 So we managed matrices using a single array to take advantage of the principle of locality of access and we divided the code into three principle functions:
 
 \begin{itemize}
@@ -137,8 +137,8 @@ On the contrary, in the \emph{main} routine, the cycle on the generations cannot
 \chapter{OpenMP parallel implementation}
 We thought different parallel implementations:
 \begin{enumerate}
-\item we tried with one parallel region in every function using static scheduling.
-	\item we decided to try opening only one parallel region, at the program start, with the serial cycle on generations and then having the for parallelization on our three functions. We tried this because we thought to avoid the continued creation and destruction of the used thread at each iteration of the generational change. So we expected this version faster than the first. We used static scheduling.
+\item we tried with one parallel region in every function using static scheduling;
+	\item we decided to try opening only one parallel region, at the program start, with the serial cycle on generations and then having the for parallelization on our three functions. We tried this because we thought to avoid the continued creation and destruction of the used thread at each iteration of the generational change. So we expected this version faster than the first. We used static scheduling;
 	\item finally we try to use dynamic scheduling with different chunk sizes, instead of the static scheduling, on the version with only one parallel region. We try only on this because we looked that was the quicker.
 \end{enumerate}
 
@@ -150,12 +150,12 @@ This processor has two physical cores and four logic cores. So, we decided to ev
 
 \noindent Our program does not have dependences on the cycles we wanted to parallelize, so it could be that hyper-threading gave benefits even if not so large.
 
-\noindent We report all its characteristics in Figure \ref{fig:2}.
+\noindent We report all the CPU's characteristics in Figure \ref{fig:2}.
 
 \begin{figure}
 	\centering
 	\includegraphics[scale = 0.5]{i5.eps}
-	\caption{processor's characteristics} \label{fig:2}
+	\caption{Processor's characteristics} \label{fig:2}
 \end{figure}
 
 
@@ -168,11 +168,11 @@ We decided to use square matrix to save the times, but we try also some cases wi
 
 \noindent We calculated the theoretical speedup using the Amdahl's law which in the parallelism case affirms that if $f$ is the fraction of a calculus that can be parallelized, $1-f$ is the portion that cannot be parallelized and $N$ is the processor's number and $H(N)$ is the overhead, we can obtain a theoretical speedup of $S_{o} = \frac{1}{(1-f) + \frac{f}{N} + H(N)}$. As seen in \cite{multi}, in case of hyper-threading, the Amdahl's law is different, assuming that every thread goes $\frac{2}{3}$ of the velocity it went without hyper-threading, we find $S_{HT} = \frac{1}{(1-f) + 0,67*(\frac{f}{N}) + H(N)}$ where $N$, now, are the number of logic cores.
 
-\noindent All our functions are parallelized except some assignment that is not significant in term of time spent, so we decided to take $f = 1$. Our processor has two physical cores and so $N =2$, finally using the Amdahl's formula we have $S_o = 2$ assuming $H(N) =0$. While, if we had benefits from multithreading, assuming a overhead of 30\% more than without hyper-threading (threads are assumed slower of $\frac{1}{3}$), we obtain $S_{HT} = 2.13$.
+\noindent All our functions are parallelized except some assignment that is not significant in term of time spent, so we decided to take $f = 1$. Our processor has two physical cores and so $N =2$, finally using the Amdahl's formula we have $S_o = 2$ assuming $H(N) =0$. While, if we had benefits from multithreading, assuming a overhead of 0.3 more than without hyper-threading, we obtain $S_{HT} = 2.13$.
 
 \noindent Then we measured times of our parallel implementation with different settings. The means of measurements are reported from Figure \ref{fig:4} to Figure \ref{fig:7}, we don't calculate the variance because it is not significant since the results differs only in order of hundredths of a second.
 
-\noindent On x-axis we have the source code used. Specifically, \emph{serial} is the serial version, \emph{parallel1} is the parallel implementation with a parallel region for each function, \emph{parallel2} is the parallel implementation with only one parallel region and \emph{parallel3} is the implementation with one parallel region and dynamic scheduling, so the number after the score is the chunk size used. On y-axis, there are execution's times.
+\noindent On x-axis we have the source code used. Specifically, \emph{serial} is the serial version, \emph{parallel1} is the parallel implementation with a parallel region for each function and static scheduling, \emph{parallel2} is the parallel implementation with only one parallel region and static scheduling and \emph{parallel3} is the implementation with one parallel region and dynamic scheduling, so the number after the score is the chunk size used. On y-axis, there are execution's times.
 
 
 \begin{figure}
@@ -211,9 +211,8 @@ A last consideration concerns with rectangular matrix. Looking at Figure \ref{fi
 
 We can see the speedup for the different simulations with two and four threads in the Figures \ref{fig:8} and \ref{fig:9}. In general, we benefit of parallel programming where the matrix is quite big and there are many generations. If the matrix is small, the serial case is very quick and so the parallelization is unuseful, a too big matrix has to be saved in memory and so there are less parallelization's benefits in term of speedup.
 
-\noindent We can note how \emph{parallel1} which has more parallel regions is the worst, in particular the gap is bigger when the number of generations becomes bigger, this behavior was expected. It seems to be better with four threads, but it is only due to the fact that \emph{parallel3-100} has a chunk size very big in relation to matrices dimension we deal with and so it has bad performances on small data, we can see how with a matrix 1000x1000 also \emph{parallel3-100}
-goes better than \emph{parallel1}. Finally with two threads, except \emph{parallel1}, other implementations have very similar results. With two threads, the maximum speedup obtained is 1.87.
-With four threads the maximum speedup is 2.01, a result that cannot be obtained with two threads (the maximum, without overhead, was 2). Being four threads we obtain similar result with one parallel region with static scheduling or with dynamic scheduling with small chunk size respect to the number of rows to make all threads working.
+\noindent We can note how \emph{parallel1}, which has more parallel regions, is the worst, in particular the gap is bigger when the number of generations becomes bigger, this behavior was expected. It seems to be better with four threads, but it is only due to the fact that \emph{parallel3-100} has a chunk size very big in relation to matrices dimension we deal with and so it has bad performances on small data, we can see how with a matrix 10000x10000 also \emph{parallel3-100} goes better than \emph{parallel1}. Finally with two threads, except \emph{parallel1}, other implementations have very similar results. With two threads, the maximum speedup obtained is 1.87.
+With four threads the maximum speedup is 2.01, a result that cannot be obtained with two threads (the maximum, without overhead, was 2). Being four threads, we obtain similar result with one parallel region with static scheduling or with dynamic scheduling with small chunk size respect to the number of rows to make all threads working.
 \begin{center}
 \begin{figure}
 	\centering
@@ -230,7 +229,7 @@ With four threads the maximum speedup is 2.01, a result that cannot be obtained 
 \end{center}
 
 \chapter{Conclusion}
-We start with a serial algorithm without any function and using a matrix, we modified it in three important functions \emph{init} which initialize the grid, \emph{evolve} which computes the next generation and \emph{update} which change the old generation with the new. We also transformed the matrix into a single array to benefit of the locality of access.
+We start with a serial algorithm without any function and using a matrix, we modified it in three important functions: \emph{init} which initialize the grid, \emph{evolve} which computes the next generation and \emph{update} which change the old generation with the new. We also transformed the matrix into a single array to benefit of the locality of access.
 
 \noindent Then we studied the possible available parallel implementations and we proposed three different implementations:
 \begin{enumerate}
@@ -238,7 +237,7 @@ We start with a serial algorithm without any function and using a matrix, we mod
  \item One with only one parallel region and static scheduling;
  \item One with only one parallel region and dynamic scheduling.
 \end{enumerate}
-In conclusion we try all the versions with two and four threads using as processor Intel® Core™ i5-3230M Processor and analyzed the results. We found that the best is the second proposal with four threads. With this we obtained a maximum speedup of two using a matrix 1000x1000 and with 1000 or more generations. A so high speedup is possible thanks to hyper-threading which has more overhead, but it works with four logic cores, so we have four threads slower than a quad-physical core CPU, but faster than two threads.
+In conclusion we try all the versions with two and four threads using as processor Intel® Core™ i5-3230M Processor and we analyzed the results. We found that the best is the second proposal with four threads. With this, we obtained a maximum speedup of two using a matrix 1000x1000 and with 1000 or more generations. A so high speedup is possible thanks to hyper-threading which has more overhead, but it works with four logic cores, so we have four threads slower than a quad-physical core CPU, but faster than two threads.
 
 
 \begin{thebibliography}{9}
