@@ -11,7 +11,7 @@
 #define NSTEPS 100  /* number of time steps */
 #define BORDERI (2 + NI)   /* added borders to the grid */
 #define BORDERJ (2 + NJ)
-#define CHUNCKSIZE 10
+#define CHUNKSIZE 10
 
 void init(int *old);
 void evolve(int *old, int *new);
@@ -23,7 +23,7 @@ void init(int *old) {
     int i, j;
     float x;
 
-    #pragma omp for schedule(dynamic, CHUNCKSIZE) private(i, j, x)
+    #pragma omp for schedule(dynamic, CHUNKSIZE) private(i, j, x)
     for(i = 0; i < BORDERI; i++) {
         for(j = 0; j < BORDERJ; j++){
             if (i==0 || j==0 || i==(BORDERI-1) || j==(BORDERJ-1)) {
@@ -53,14 +53,14 @@ void evolve(int *old, int *new) {
     old[(BORDERI-1)*(BORDERJ)] = old[BORDERJ + NJ];
 
     /* left-right boundary conditions */
-    #pragma omp for schedule(dynamic, CHUNCKSIZE) private(i)
+    #pragma omp for schedule(dynamic, CHUNKSIZE) private(i)
     for(i = 1; i < BORDERI-1; i++) {
         old[i*(BORDERJ)] = old[i*(BORDERJ) + NJ];
         old[i*(BORDERJ) + BORDERJ-1] = old[i*(BORDERJ) + 1];
     }
 
     /* top-bottom boundary conditions */
-    #pragma omp for schedule(dynamic, CHUNCKSIZE) private(j)
+    #pragma omp for schedule(dynamic, CHUNKSIZE) private(j)
     for(j = 1; j < BORDERJ-1; j++){
         old[j] = old[NI*BORDERJ + j];
         old[(BORDERI-1)*(BORDERJ) + j] = old[BORDERJ + j];
@@ -69,7 +69,7 @@ void evolve(int *old, int *new) {
     #pragma omp barrier
 
     //show(old);
-    #pragma omp for schedule(dynamic, CHUNCKSIZE) private(i, j)
+    #pragma omp for schedule(dynamic, CHUNKSIZE) private(i, j)
     for(i = 1; i < BORDERI-1; i++) {
         for(j = 1; j < BORDERJ-1; j++){
             iu = i-1;   //up
@@ -98,7 +98,7 @@ void evolve(int *old, int *new) {
 /* copy new state into old state */
 void update(int *old, int *new) {
     int i, j;
-    #pragma omp for schedule(dynamic, CHUNCKSIZE) private(i, j)
+    #pragma omp for schedule(dynamic, CHUNKSIZE) private(i, j)
     for(i = 1; i < BORDERI-1; i++) {
         for(j = 1; j < BORDERJ-1; j++){
             old[i*(BORDERJ) + j] = new[i*(BORDERJ) + j];
