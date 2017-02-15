@@ -1,0 +1,149 @@
+/***********************************************
+ * parallel version with more parallel regions
+***********************************************/
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <omp.h>
+
+#define NI 1000     /* array sizes */
+#define NJ 1000
+#define NSTEPS 100  /* number of time steps */
+#define BORDERI (2 + NI)   /* added borders to the grid */
+#define BORDERJ (2 + NJ)
+
+void init(int *old);
+void evolve(int *old, int *new);
+void update(int *old, int *new);
+void show(int *array);
+
+/* initialize elements of the array to 0 or 1 randomly */
+void init(int *old) {
+    int i, j;
+    float x;
+
+    #pragma omp parallel for schedule(static) private(i, j, x) shared(old)
+    for(i = 0; i < BORDERI; i++) {
+        for(j = 0; j < BORDERJ; j++){
+            if (i==0 || j==0 || i==(BORDERI-1) || j==(BORDERJ-1)) {
+                /* borders are initialized to 0 */
+                old[i*(BORDERJ) + j]=0;
+            }
+            else {
+                x = rand()/((float)RAND_MAX + 1);
+                if(x < 0.5) {
+                    old[i*(BORDERJ) + j] = 0;
+                } else {
+                    old[i*(BORDERJ) + j] = 1;
+                }
+            }
+        }
+    }
+}
+
+/* change from old state to new state */
+void evolve(int *old, int *new) {
+    int i, j, iu, id, jl, jr, nsum = 0;
+
+    /* corner boundary conditions */
+    old[0] = old[NI*BORDERJ + NJ];
+    old[BORDERJ-1] = old[NI*BORDERJ + 1];
+    old[(BORDERI-1)*(BORDERJ) + BORDERJ-1] = old[BORDERJ + 1];
+    old[(BORDERI-1)*(BORDERJ)] = old[BORDERJ + NJ];
+
+    /* left-right boundary conditions */
+    #pragma omp parallel for schedule(static) private(i) shared(old)
+    for(i = 1; i < BORDERI-1; i++) {
+        old[i*(BORDERJ)] = old[i*(BORDERJ) + NJ];
+        old[i*(BORDERJ) + BORDERJ-1] = old[i*(BORDERJ) + 1];
+    }
+
+    /* top-bottom boundary conditions */
+    #pragma omp parallel for schedule(static) private(j) shared(old)
+    for(j = 1; j < BORDERJ-1; j++){
+        old[j] = old[NI*BORDERJ + j];
+        old[(BORDERI-1)*(BORDERJ) + j] = old[BORDERJ + j];
+    }
+
+    //show(old);
+
+    #pragma omp parallel for schedule(static) private(i, j, iu, id, jl, jr, nsum) shared(old, new)
+    for(i = 1; i < BORDERI-1; i++) {
+        for(j = 1; j < BORDERJ-1; j++){
+            iu = i-1;   //up
+            id = i+1;   //down
+            jl = j-1;   //left
+            jr = j+1;   //right
+
+            /* sum of the neighbors of a cell */
+            nsum = old[iu * (BORDERJ) +jl] + old[iu * (BORDERJ) +j] + old[iu * (BORDERJ) +jr] + old[i * (BORDERJ) +jl] + old[i * (BORDERJ) +jr] + old[id * (BORDERJ) +jl] + old[id * (BORDERJ) +j] + old[id * (BORDERJ) +jr];
+            //printf("i: %d j:%d sum :%d \n ", i , j, nsum);
+
+            if (nsum == 3) {
+                new[i*(BORDERJ) + j] = 1;   /* alive */
+                nsum = 0;
+            } else if (nsum == 2) {
+                new[i*(BORDERJ) + j] = old[i*(BORDERJ) + j];   /* equal to the previous state */
+                nsum = 0;
+            } else {
+                new[i*(BORDERJ) + j] = 0;   /* dead */
+                nsum = 0;
+            }
+        }
+    }
+}
+
+/* copy new state into old state */
+void update(int *old, int *new) {
+    int i, j;
+
+    #pragma omp parallel for schedule(static) private(i, j) shared(old)
+    for(i = 1; i < BORDERI-1; i++) {
+        for(j = 1; j < BORDERJ-1; j++){
+            old[i*(BORDERJ) + j] = new[i*(BORDERJ) + j];
+        }
+    }
+}
+
+/* print a given array */
+void show(int *array) {
+    int i, j;
+
+    for(i = 0; i < BORDERI; i++) {
+        for(j = 0; j < BORDERJ; j++) {
+            printf("%d", array[i*(BORDERJ) + j]);
+        }
+        printf("\n");
+    }
+    printf("\n");
+}
+
+int main(int argc, char *argv[]) {
+
+    int *old, *new;
+    int i, j, n;
+    double end, start;
+
+    /* allocate arrays */
+    old = malloc(BORDERI * BORDERJ * sizeof(int));
+    new = malloc(BORDERI * BORDERJ * sizeof(int));
+
+    start = omp_get_wtime();
+
+    init(old);
+    //show(old);
+
+    for (n = 0; n < NSTEPS; n++) {
+        evolve(old, new);
+        update(old, new);
+    }
+
+    //show(old);
+    end = omp_get_wtime();
+    printf("Calculation time: %f\n", end - start);
+
+    free(old);
+    free(new);
+
+    return 0;
+}
