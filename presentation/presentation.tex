@@ -15,17 +15,23 @@
 	\titlepage
 \end{frame}
 
-\section{Conway's Game of Life}
+\section{Introduction}
 \begin{frame}
-	\frametitle{Conway's Game of Life}
+	\frametitle{Introduction}
+	\begin{itemize}
+				\item Solution of the mystery of self-reproduction in cellular automata;
+				\item Collection of cells on a grid;
+				\item Set of rules for cells' evolution.
+	\end{itemize}
+	\vfill
 	\begin{columns}
-		\column{0.8\textwidth}
-		\begin{block}{Introduction}
+		\column{0.9\textwidth}
+		\begin{block}{Conway's Game of Life}
 			\begin{itemize}
-				\item 2-dimensional cellular automaton
-				\item Zero-player game
-				\item Possibility to create several patterns
-				\item States of a population: $0 \rightarrow dead$, $1 \rightarrow alive$
+				\item 2-dimensional cellular automaton;
+				\item Zero-player game;
+				\item Possibility to create several patterns;
+				\item States of a population: $0 \rightarrow dead$, $1 \rightarrow alive$.
 			\end{itemize}
 		\end{block}
 	\end{columns}
@@ -46,17 +52,17 @@
 \begin{frame}
 	\frametitle{Serial Code Analysis}
 	\begin{itemize}
-		\item The universe of the Game is represented by a rectangular grid
-		\item Toroidal boundary conditions to reduce errors at the edges
-		\item Matrices transformed in 1-D array
+		\item The universe of the Game is represented by a rectangular grid;
+		\item Toroidal boundary conditions to reduce errors at the edges;
+		\item Matrices transformed in 1-D array.
 	\end{itemize}
-
+	\vfill
 	\begin{columns}
 		\column{0.9\textwidth}
 		\begin{block}{Core functions}
-			\textit{init}: it initializes the grid of the Game and the boundaries\\[0.15 cm]
-			\textit{evolve}: it updates boundary conditions and applies transition rules\\[0.15 cm]
-			\textit{update}: it swaps the previous state with the one
+			\textit{init}: it initializes the grid of the Game and the boundaries;\\[0.15 cm]
+			\textit{evolve}: it updates boundary conditions and applies transition rules;\\[0.15 cm]
+			\textit{update}: it swaps the previous state with the one;
 		\end{block}
 	\end{columns}
 \end{frame}
@@ -68,31 +74,54 @@
 		\column{0.7\textwidth}
 		\begin{block}{Processor's Characteristics}
 			\begin{itemize}
-				\item 2 physical cores
-				\item 4 logic cores
-				\item Frequency: 2.60 GHz
+				\item 2 physical cores;
+				\item 4 logic cores;
+				\item Frequency: 2.60 GHz.
 			\end{itemize}
 		\end{block}
 	\end{columns}
 \end{frame}
 
 \section{OpenMP Parallel Implementation}
-\begin{frame}[fragile]
+\begin{frame}
 	\frametitle{OpenMP Parallel Implementation}
+	\begin{itemize}
+				\item Two nested cycles in every function: parallelized the external cycle;
+				\item No complex calculus;
+				\item Speedup given by evolving more rows at the same time.
+	\end{itemize}
+	\vfill
 	\begin{columns}
 		\column{0.9\textwidth}
 		\begin{block}{Versions}
 			\begin{itemize}
-				\item \emph{parallel1.c}: one parallel region in every parallelized function, static scheduling
-				\item \emph{parallel2.c}: only one parallel region, static scheduling
-				\item \emph{parallel3.c}: one parallel region, dynamic scheduling
+				\item \emph{parallel1.c}: one parallel region in every parallelized function, static scheduling;
+				\item \emph{parallel2.c}: only one parallel region, static scheduling;
+				\item \emph{parallel3.c}: one parallel region, dynamic scheduling.
 			\end{itemize}
 		\end{block}
 	\end{columns}
-
-	\vfill
-	We parallelized \emph{for} loops with the directives \begin{semiverbatim}#pragma omp parallel for\end{semiverbatim} \begin{semiverbatim}#pragma omp for\end{semiverbatim}
 \end{frame}
+
+\section{Performance's Measurements}
+\begin{frame}
+	\frametitle{Amdahl's Law}
+	\begin{columns}
+		\column{0.9\textwidth}
+		\begin{block}{}
+			\begin{itemize}
+				\item Theoretical speedup: $S_{o} = \frac{1}{(1-f) + \frac{f}{N} + H(N)} = 2$;
+				\item Hyper-threading case: $S_{HT} = \frac{1}{(1-f) + 0,67*(\frac{f}{N}) + H(N)} = 2.13$.
+			\end{itemize}
+		\end{block}
+	\end{columns}
+	\vfill
+	\begin{itemize}
+		\item $f = 1$, fraction of parallelized code;
+		\item $N = 2$ and $H(N) = 0$ in $S_{o}$;
+		\item $N = 4$ and $H(N) = 0.3$ in $S_{HT}$.
+	\end{itemize}
+\end{frame}	
 
 \section{Performance's Measurements}
 \begin{frame}
@@ -153,9 +182,8 @@
 	\frametitle{Conclusion}
 	\begin{itemize}
 		\item We began with a serial algorithm using a matrix and without functions;
-		\item We transformed the matrix into a single array and we wrote three core functions;
-		\item We studied the available parallelism;
-		\item We proposed three parallel implementations;
+		\item We transformed the matrix into a 1-D array and we wrote three core functions;
+		\item We studied the available parallelism and we proposed three parallel implementations;
 		\item We tried all the versions on Intel Core i5-3230M using two and four threads;
 		\item We found that the best proposal is the version with one parallel region, static scheduling and four threads.
 	\end{itemize}
