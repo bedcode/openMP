@@ -18,7 +18,6 @@
 \section{Conway's Game of Life}
 \begin{frame}
 	\frametitle{Conway's Game of Life}
-
 	\begin{columns}
 		\column{0.8\textwidth}
 		\begin{block}{Introduction}
@@ -65,19 +64,21 @@
 \section{Processor used}
 \begin{frame}
 	\frametitle{\emph{Intel Core i5-3230M} Processor}
-	\begin{block}{Processor's Characteristics}
-	\begin{itemize}
-		\item 2 physical cores
-		\item 4 logic cores
-		\item Frequency: 2.60 GHz
-	\end{itemize}
-	\end{block}
+	\begin{columns}
+		\column{0.7\textwidth}
+		\begin{block}{Processor's Characteristics}
+			\begin{itemize}
+				\item 2 physical cores
+				\item 4 logic cores
+				\item Frequency: 2.60 GHz
+			\end{itemize}
+		\end{block}
+	\end{columns}
 \end{frame}
 
 \section{OpenMP Parallel Implementation}
 \begin{frame}[fragile]
 	\frametitle{OpenMP Parallel Implementation}
-
 	\begin{columns}
 		\column{0.9\textwidth}
 		\begin{block}{Versions}
@@ -96,7 +97,6 @@
 \section{Performance's Measurements}
 \begin{frame}
 	\frametitle{Performance's Measurements}
-
 	\begin{figure}
 		\centering
 		\begin{minipage}{0.5\textwidth}
@@ -115,7 +115,6 @@
 \section{Performance's Measurements}
 \begin{frame}
 	\frametitle{Performance's Measurements}
-
 	\begin{figure}
 		\centering
 		\begin{minipage}{0.5\textwidth}
@@ -134,7 +133,6 @@
 \section{Speedup}
 \begin{frame}
 	\frametitle{Speedup}
-
 	\begin{figure}
 		\centering
 		\begin{minipage}{0.5\textwidth}
@@ -155,12 +153,12 @@
 	\frametitle{Conclusion}
 	\begin{itemize}
 		\item We began with a serial algorithm using a matrix and without functions;
-		\item We transformed the matrix into a single array and we wrote three core functions
+		\item We transformed the matrix into a single array and we wrote three core functions;
 		\item We studied the available parallelism;
 		\item We proposed three parallel implementations;
 		\item We tried all the versions on Intel Core i5-3230M using two and four threads;
 		\item We found that the best proposal is the version with one parallel region, static scheduling and four threads.
-		
 	\end{itemize}
-	\end{frame}
+\end{frame}
+
 \end{document}
