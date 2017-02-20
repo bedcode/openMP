@@ -19,9 +19,9 @@
 \begin{frame}
 	\frametitle{Introduction}
 	\begin{itemize}
-				\item Solution of the mystery of self-reproduction in cellular automata;
-				\item Collection of cells on a grid;
-				\item Set of rules for cells' evolution.
+		\item Solution of the mystery of self-reproduction in cellular automata;
+		\item Collection of cells on a grid;
+		\item Set of rules for cells' evolution.
 	\end{itemize}
 	\vfill
 	\begin{columns}
@@ -51,32 +51,46 @@
 \section{Serial Code Analysis}
 \begin{frame}
 	\frametitle{Serial Code Analysis}
-	\begin{itemize}
-		\item The universe of the Game is represented by a rectangular grid;
-		\item Toroidal boundary conditions to reduce errors at the edges;
-		\item Matrices transformed in 1-D array.
-	\end{itemize}
-	\vfill
-	\begin{columns}
-		\column{0.9\textwidth}
-		\begin{block}{Core functions}
-			\textit{init}: it initializes the grid of the Game and the boundaries;\\[0.15 cm]
-			\textit{evolve}: it updates boundary conditions and applies transition rules;\\[0.15 cm]
-			\textit{update}: it swaps the previous state with the one;
-		\end{block}
-	\end{columns}
+	\begin{minipage}{0.6\textwidth}
+		\begin{itemize}
+			\item The universe of the Game is represented by a rectangular grid;
+			\item Toroidal boundary conditions to reduce errors at the edges;
+			\item Matrices transformed in 1-D array.
+		\end{itemize}
+		\begin{columns}
+			\column{0.9\textwidth}
+			\begin{block}{Core functions}
+				\begin{itemize}
+					\item \textit{init}: it initializes the grid of the Game and the boundaries;\\
+					\item \textit{evolve}: it updates boundary conditions and applies transition rules;\\
+					\item \textit{update}: it swaps the previous state with the one.
+				\end{itemize}
+			\end{block}
+		\end{columns}
+	\end{minipage}%
+	\begin{minipage}{0.4\textwidth}
+		\begin{figure}
+			\centering
+			\includegraphics[width=\linewidth]{../report/chart.eps}
+		\end{figure}
+	\end{minipage}
 \end{frame}
 
 \section{Processor used}
 \begin{frame}
 	\frametitle{\emph{Intel Core i5-3230M} Processor}
+	\begin{figure}
+		\centering
+		\includegraphics[scale=0.2]{intel_i5.png}
+	\end{figure}
 	\begin{columns}
 		\column{0.7\textwidth}
 		\begin{block}{Processor's Characteristics}
 			\begin{itemize}
 				\item 2 physical cores;
 				\item 4 logic cores;
-				\item Frequency: 2.60 GHz.
+				\item Frequency: 2.60 GHz;
+				\item 3-level cache.
 			\end{itemize}
 		\end{block}
 	\end{columns}
@@ -86,9 +100,9 @@
 \begin{frame}
 	\frametitle{OpenMP Parallel Implementation}
 	\begin{itemize}
-				\item Two nested cycles in every function: parallelized the external cycle;
-				\item No complex calculus;
-				\item Speedup given by evolving more rows at the same time.
+		\item Two nested cycles in every function: parallelized the external cycle;
+		\item No complex calculus;
+		\item Speedup given by evolving more rows at the same time.
 	\end{itemize}
 	\vfill
 	\begin{columns}
@@ -121,7 +135,7 @@
 		\item $N = 2$ and $H(N) = 0$ in $S_{o}$;
 		\item $N = 4$ and $H(N) = 0.3$ in $S_{HT}$.
 	\end{itemize}
-\end{frame}	
+\end{frame}
 
 \section{Performance's Measurements}
 \begin{frame}
